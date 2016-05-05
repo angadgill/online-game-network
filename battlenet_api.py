@@ -7,7 +7,6 @@ Author: Angad Gill
 Inspired by: https://github.com/vishnevskiy/battlenet
 """
 
-
 import requests
 
 
@@ -28,9 +27,20 @@ class BattleNet(object):
     def realms(self):
         """
         Fetch information about all realms.
-        :return: dict contain realm information.
+        :return: dict contain realm data.
         """
         url = self._url('realm/status')
         r = requests.get(url)
         realms = r.json()['realms']  # List of dicts
         return realms
+
+    def challenges(self, realm):
+        """
+        Fetch information about all challenges in a realm.
+        :param realm:
+        :return: dict containing challenge data
+        """
+        url = self._url('challenge/' + realm)
+        r = requests.get(url)
+        challenges = r.json()['challenge']  # List of dicts
+        return challenges
