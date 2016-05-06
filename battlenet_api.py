@@ -24,14 +24,20 @@ class BattleNet(object):
         url = self.base_url + concept + '?locale=' + self.locale + '&apikey=' + self.public_key
         return url
 
+    def _get_data(self, url, dict_key):
+        r = requests.get(url)
+        if r.status_code != 200:
+            raise Exception('Connection error!')
+        else:
+            return r.json()[dict_key]
+
     def realms(self):
         """
         Fetch information about all realms.
         :return: dict contain realm data.
         """
         url = self._url('realm/status')
-        r = requests.get(url)
-        realms = r.json()['realms']  # List of dicts
+        realms = self._get_data(url, 'realms')  # List of dicts
         return realms
 
     def challenges(self, realm):
@@ -41,6 +47,5 @@ class BattleNet(object):
         :return: dict containing challenge data
         """
         url = self._url('challenge/' + realm)
-        r = requests.get(url)
-        challenges = r.json()['challenge']  # List of dicts
+        challenges = self._get_data(url, 'challenge')  # List of dicts
         return challenges
