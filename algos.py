@@ -4,6 +4,8 @@ All algorithms and functions are written here
 Author: Angad Gill
 """
 
+import networkx as nx
+
 
 def add_clique_with_weights(graph, nodes, edge_attr=None):
     """
@@ -47,3 +49,57 @@ def normalize(numbers):
     """
     numbers = (numbers - np.mean(numbers))/np.std(numbers)
     return numbers
+
+
+def generate_team_graph(challenges):
+    """
+    Generate a NetworkX graph based on data from a list of Challenges
+    :param challenges: list of dicts containing Challenge data
+    :return: networkx graph
+    """
+    # Create a graph of all characters as nodes
+    # and number of challanges on leaderboard as edges
+    g = nx.Graph()
+
+    for challenge in challenges:
+        for group in challenge['groups']:
+            names = []  # List of node names to add to graph
+            for member in group['members']:
+                if member.has_key('character'):  # Only add if character info is available
+                    name = member['character']['name']
+                    #                 print name
+                    names += [name]
+                    #         print names
+            g = add_clique_with_weights(g, names)
+
+    return g
+
+
+def get_metrics(challenges, graph):
+    """
+    For a given network of characters and list of challenges completed by these characters, this function computes the
+    algebraic connectivity for each group that played together and extracts the time taken by the team to complete
+    challenge.
+
+    :param:
+        challenges: list of dict containing Challenge info
+        graph: NetworkX graph of characters
+    :return:
+        tuple of two lists: algebraic connectivity and Challenge completion time
+    """
+    ac = []
+    time = []
+
+    for challenge in challenges:
+        for group in challenge['groups']:
+            names = []  # List of node names to add to graph
+            for member in group['members']:
+                if member.has_key('character'):  # Only add if character info is available
+                    name = member['character']['name']
+                    names += [name]
+
+            g_team = graph.subgraph(names)
+            if len(g_team.nodes()) > 1:
+                ac += [nx.algebraic_connectivity(g_team)]
+                time += [group['time']['time']]
+    return ac, time
