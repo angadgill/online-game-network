@@ -75,7 +75,7 @@ def generate_team_graph(challenges):
     return g
 
 
-def get_metrics(challenges, graph):
+def get_metrics(challenges, graph, ac_metric= True, time_metric=True, degree_metrics=False):
     """
     For a given network of characters and list of challenges completed by these characters, this function computes the
     algebraic connectivity for each group that played together and extracts the time taken by the team to complete
@@ -84,11 +84,16 @@ def get_metrics(challenges, graph):
     :param:
         challenges: list of dict containing Challenge info
         graph: NetworkX graph of characters
+        ac_metric: Boolean. Default True. Function returns algebraic connectivity if set to True.
+        time_metric: Boolean. Default True. Function returns challenge completion time if set to True.
+        degree_metrics: Boolean. Default False. Function returns
     :return:
         tuple of two lists: algebraic connectivity and Challenge completion time
     """
-    ac = []
-    time = []
+    if ac_metric:
+        ac = []
+    if time_metric:
+        time = []
 
     for challenge in challenges:
         for group in challenge['groups']:
@@ -100,6 +105,9 @@ def get_metrics(challenges, graph):
 
             g_team = graph.subgraph(names)
             if len(g_team.nodes()) > 1:
-                ac += [nx.algebraic_connectivity(g_team)]
-                time += [group['time']['time']]
+                if ac_metric:
+                    ac += [nx.algebraic_connectivity(g_team)]
+                if time_metric:
+                    time += [group['time']['time']]
+    # r =
     return ac, time
