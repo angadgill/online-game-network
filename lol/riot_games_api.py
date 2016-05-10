@@ -55,6 +55,34 @@ class RiotGames(object):
             raise Exception('Connection error!')
 
 
+    def get_static_match_data(self):
+        """
+        Get all static data provided by the API
+        Returns:
+            list of dicts containing match data.
+        """
+        matches = []
+
+        def gen_static_url(num):
+            url = 'https://s3-us-west-1.amazonaws.com/riot-api/seed_data/matches%d.json' % num
+            return url
+
+        for num in range(1, 11):
+            url = gen_static_url(num)
+            print "Fetching %s ..." % url
+            r = requests.get(url)
+            try:
+                data = r.json()
+                matches += data['matches']
+                print "Done!"
+            except:
+                print "Error! Skipping."
+            time.sleep(1)
+        print "All done!"
+
+        return matches
+
+
     def get_matches_by_summoner(self, summonerId):
         """
         Get match data from API given a summonerId.
