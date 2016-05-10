@@ -11,7 +11,7 @@ class RiotGames(object):
     """
     Simple class to access Riot Games API
     """
-    def __init__(self, key_filename, max_retries=5, retry_sleep=2):
+    def __init__(self, key_filename, max_retries=5, retry_sleep=4):
         """
         Initialize a RiotGames object. This is used to get data uding the API.
 
@@ -42,6 +42,7 @@ class RiotGames(object):
         """
         r = requests.get(url)
         if r.status_code == 200:
+            self._retry_count = 0
             return r.json()
         elif r.status_code == 403:
             raise Exception("Error 403: Forbidden!")
@@ -53,8 +54,10 @@ class RiotGames(object):
             time.sleep(sleeptime)  # Sleep to not inundate API
             return self._get_json(url)  # Retry called recursively
         elif r.status_code == 429:
+            self._retry_count = 0
             raise Exception('Error 429: API rate limit reached!')
         else:
+            self._retry_count = 0
             raise Exception('Connection error!')
 
 
