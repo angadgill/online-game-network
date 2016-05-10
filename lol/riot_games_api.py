@@ -43,14 +43,17 @@ class RiotGames(object):
         r = requests.get(url)
         if r.status_code == 200:
             return r.json()
+        elif r.status_code == 403:
+            raise Exception("Error 403: Forbidden!")
         elif self._retry_count < self.max_retires:  # retry if count < max
             sleeptime = self.retry_sleep
-            self._retry_count =+ 1  # increment count
+            self._retry_count += 1  # increment count
+            print "Status code: %d, \t Retry count: %d" % (r.status_code, self._retry_count)
             print "Retrying in %0.2f seconds" % sleeptime
             time.sleep(sleeptime)  # Sleep to not inundate API
             return self._get_json(url)  # Retry called recursively
         elif r.status_code == 429:
-            raise Exception('API rate limit reached!')
+            raise Exception('Error 429: API rate limit reached!')
         else:
             raise Exception('Connection error!')
 
@@ -118,15 +121,34 @@ class RiotGames(object):
         return match
 
 
-    def get_summonerIds_by_match(self, matchId):
+    def get_summonerIds_by_match(self, matchId, team_with=None):
         """
-        Get match data from API given a matchId and extract summonerIds from it.
-        :param matchId: int of matchId
-        :return: list of ints containing summonerIds
+        Get match data from API given a matchId and extract summonerIds from it. If team_with
+        info is provided, this function returns summonerIds from the same team, including the team_with ID.
+        Args:
+            matchId: int of matchId
+            team_with: summonerId of team member
+
+        Returns:
+            dict containing match data
         """
-        summonerIds = []
+        summonerId_from_team = {100: [], 200: []}  # dict for team to summonerId mapping
+        team_from_summonerId = {}  # dict for summonerId to team mapping
+
         match = self.get_match(matchId)
-        for p in match['participantIdentities']:
-            summonerIds += [p['player']['summonerId']]
-        return summonerIds
+
+        if len(match['participants']) != len(match['participantIdentities']):
+            Exception("Error: 'participants' and 'participantIdentities' len don't match ")
+
+        for p_idx in range(len(match['participants'])):
+            summonerId = match['participantIdentities'][p_idx]['player']['summonerId']
+            teamId = match['participants'][p_idx]['teamId']
+            summonerId_from_team[teamId] += [summonerId]
+            team_from_summonerId[summonerId] = teamId
+
+        if team_with == None:
+            return summonerId_from_team[100] + summonerId_from_team[200]
+        else:
+            team_with_teamId = team_from_summonerId[team_with]
+            return summonerId_from_team[team_with_teamId]
 
