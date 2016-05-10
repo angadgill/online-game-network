@@ -4,17 +4,25 @@ Simple API to access League of Legends data using Riot Games API
 Author: Angad Gill
 """
 
-
 import requests
-
+import time
 
 class RiotGames(object):
     """
     Simple class to access Riot Games API
     """
-    def __init__(self, key_filename):
-        self.key = self._get_key(key_filename)
+    def __init__(self, key_filename, max_retries=5, retry_sleep=2):
+        """
+        Initialize a RiotGames object. This is used to get data uding the API.
 
+        :param key_filename: path to file containing API key stored on disk
+        :param max_retries: max number of retries when getting data
+        :param retry_sleep: seconds of sleep between retries
+        """
+        self.key = self._get_key(key_filename)
+        self.max_retires = max_retries  # when getting data from server
+        self._retry_count = 0  # current retry count
+        self.retry_sleep = retry_sleep  # seconds between retries
 
     def _get_key(self, key_filename):
         """
@@ -35,6 +43,12 @@ class RiotGames(object):
         r = requests.get(url)
         if r.status_code == 200:
             return r.json()
+        elif self._retry_count < self.max_retires:  # retry if count < max
+            sleeptime = self.retry_sleep
+            self._retry_count =+ 1  # increment count
+            print "Retrying in %0.2f seconds" % sleeptime
+            time.sleep(sleeptime)  # Sleep to not inundate API
+            return self._get_json(url)  # Retry called recursively
         elif r.status_code == 429:
             raise Exception('API rate limit reached!')
         else:
