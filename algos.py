@@ -5,7 +5,6 @@ Author: Angad Gill
 """
 
 import networkx as nx
-import utils
 
 
 def add_clique_with_weights(graph, nodes, edge_attr=None):
