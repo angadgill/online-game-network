@@ -124,12 +124,13 @@ class RiotGames(object):
         return match
 
 
-    def get_summonerIds_by_match(self, matchId, team_with=None):
+    def get_summonerIds_by_match(self, match=None, matchId=None, team_with=None):
         """
-        Get match data from API given a matchId and extract summonerIds from it. If team_with
+        Get match data from API given a matchId or match dict and extract summonerIds from it. If team_with
         info is provided, this function returns summonerIds from the same team, including the team_with ID.
         Args:
             matchId: int of matchId
+            match: dict containing match data
             team_with: summonerId of team member
 
         Returns:
@@ -138,7 +139,11 @@ class RiotGames(object):
         summonerId_from_team = {100: [], 200: []}  # dict for team to summonerId mapping
         team_from_summonerId = {}  # dict for summonerId to team mapping
 
-        match = self.get_match(matchId)
+        if matchId is not None:
+            match = self.get_match(matchId)
+
+        if match is None:
+            raise ValueError("No match data found")
 
         if len(match['participants']) != len(match['participantIdentities']):
             Exception("Error: 'participants' and 'participantIdentities' len don't match ")
