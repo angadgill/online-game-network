@@ -21,33 +21,38 @@ def add_clique_with_weights(graph, nodes, edge_attr=None):
     Return:
         graph: NetworkX graph data structure with added clique
     """
+
+    # Add all nodes to graph
     graph.add_nodes_from(nodes)
 
     num_nodes = len(nodes)
 
-    # Create all combinations of nodes
+    # Add all combinations of edges, to form a clique
     for i in range(num_nodes):
         for j in range(i+1, num_nodes):  # No self-edges
             node1 = nodes[i]
             node2 = nodes[j]
             if graph.has_edge(node1, node2):
+                edge = graph.edge[node1][node2]
+
                 # Add weight if edge exists
-                graph.edge[node1][node2]['weight'] += 1
+                edge['weight'] += 1
 
                 # Append edge_attr values to the edge
+
                 if edge_attr is not None:
                     for key in edge_attr.keys():
-                        if type(graph.edge[node1][node2][key]) is list:
-                            graph.edge[node1][node2][key] += \
-                                [edge_attr[key]]
+                        # TODO: Remove this check and figure out why edge_attr sometimes has 'weight' in it
+                        if key == 'weight':
+                            continue
+                        if type(edge[key]) is list:
+                            edge[key] += [edge_attr[key]]
                         else:
-                            graph.edge[node1][node2][key] = \
-                                [graph.edge[node1][node2][key], edge_attr[key]]
+                            edge[key] = [edge[key], edge_attr[key]]
 
             else:
                 # Create a new edge if it doesn't exist
-                graph.add_edge(node1, node2, weight=1,
-                               attr_dict=edge_attr)
+                graph.add_edge(node1, node2, weight=1, attr_dict=edge_attr)
 
     return graph
 
