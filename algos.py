@@ -5,17 +5,19 @@ Author: Angad Gill
 """
 
 import networkx as nx
+import utils
 
 
 def add_clique_with_weights(graph, nodes, edge_attr=None):
     """
     Creates a clique between nodes. Creates undirected edges with weight=1.
-    Adds weight to edges if they already exist.
+    Adds weight to edges if they already exist. It also appends edge attributes
+    such that the values form a list.
 
     Parameters:
         graph: NetworkX graph data structure
         nodes: list of nodes
-        edge_attr:
+        edge_attr: dict containing edge attributes
     Return:
         graph: NetworkX graph data structure with added clique
     """
@@ -31,9 +33,21 @@ def add_clique_with_weights(graph, nodes, edge_attr=None):
             if graph.has_edge(node1, node2):
                 # Add weight if edge exists
                 graph.edge[node1][node2]['weight'] += 1
+
+                # Append edge_attr values to the edge
+                if edge_attr is not None:
+                    for key in edge_attr.keys():
+                        if type(graph.edge[node1][node2][key]) is list:
+                            graph.edge[node1][node2][key] += \
+                                [edge_attr[key]]
+                        else:
+                            graph.edge[node1][node2][key] = \
+                                [graph.edge[node1][node2][key], edge_attr[key]]
+
             else:
                 # Create a new edge if it doesn't exist
-                graph.add_edge(node1, node2, weight=1)
+                graph.add_edge(node1, node2, weight=1,
+                               attr_dict=edge_attr)
 
     return graph
 

@@ -55,3 +55,44 @@ def list_of_dict_to_dict(list_of_dict, key):
         dict_of_dict[value] = item  # adds item to the new dict
 
     return dict_of_dict
+
+
+def dict_values_to_lists(input_dict):
+    """
+    Converts all values in the dict to a list containing the value.
+
+    Args:
+        input_dict: any dict
+
+    Returns:
+        dict with values converted to lists
+    """
+    if input_dict is None:
+        return None
+
+    for key in input_dict.keys():
+        input_dict[key] = [input_dict[key]]
+
+    return input_dict
+
+
+def dict_append_to_value_lists(dict_appendee, dict_new):
+    """
+    Appends values from dict_new to list of values with same key in dict_appendee
+    Args:
+        dict_appendee: dict with value lists (as created by dict_values_to_lists function
+        dict_new: dict with new values that need to be appended to dict_appendee
+
+    Returns:
+        dict with appended values
+    """
+    if dict_new is None:
+        return None
+
+    for key in dict_new.keys():
+        if type(dict_appendee[key]) != list:
+            raise TypeError("Dict value is not a list")
+
+        dict_appendee[key] += [dict_new[key]]
+
+    return dict_appendee
