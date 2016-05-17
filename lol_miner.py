@@ -123,6 +123,7 @@ def mine(checkpoint_num, matches, discovered_summonerIds, g, max_hop, bfs_queue,
         for i, matchId in enumerate(matchIds):
             print "\rMatch %d out of %d [%0.1f%%]" % (i+1, num_matches, (i+1)/float(num_matches)*100),
 
+            # TODO: matches occupies the most of amount of space in memory. Track discovered matchIds in a separate dict
             if matchId in matches:  # skip loop if match info already retreived
                 continue
 
@@ -154,8 +155,8 @@ def mine(checkpoint_num, matches, discovered_summonerIds, g, max_hop, bfs_queue,
 
         if loop_count % CHECKPOINT_INTERVAL == 0:
             # Save data every CHECKPOINT_INTERVAL number of summonerIds
-            save_state(checkpoint_num, matches, discovered_summonerIds, g, max_hop, bfs_queue, hop)
             checkpoint_num += 1
+            save_state(checkpoint_num, matches, discovered_summonerIds, g, max_hop, bfs_queue, hop)
             return ""
 
 
