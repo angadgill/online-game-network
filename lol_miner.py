@@ -48,21 +48,23 @@ def initialize(summonerId):
     return matches, discovered_summonerIds, g, max_hop, bfs_queue, hop
 
 
-def load_state(num):
+def load_state(checkpoint_num):
     """
     Load data structures from disk using a checkpoint number.
     Args:
-        num:
+        checkpoint_num:
 
     Returns:
         matches, discovered_summonerIds, g, max_hop, bfs_queue, hop
     """
-    matches = utils.load_data('matches_' + str(num))
-    discovered_summonerIds = utils.load_data('discovered_summonerIds_' + str(num))
-    g = utils.load_data('g_' + str(num))
-    max_hop = utils.load_data('max_hop_' + str(num))
-    bfs_queue = utils.load_data('bfs_queue_' + str(num))
-    hop = utils.load_data('hop_' + str(num))
+    print "Loading data from checkpoint %d ..." % checkpoint_num
+    matches = utils.load_data('matches_' + str(checkpoint_num))
+    discovered_summonerIds = utils.load_data('discovered_summonerIds_' + str(checkpoint_num))
+    g = utils.load_data('g_' + str(checkpoint_num))
+    max_hop = utils.load_data('max_hop_' + str(checkpoint_num))
+    bfs_queue = utils.load_data('bfs_queue_' + str(checkpoint_num))
+    hop = utils.load_data('hop_' + str(checkpoint_num))
+    print "Done loading."
     return matches, discovered_summonerIds, g, max_hop, bfs_queue, hop
 
 
@@ -82,7 +84,7 @@ def save_state(checkpoint_num, matches, discovered_summonerIds, g, max_hop, bfs_
         no return
     """
     # Save state
-    print "Saving state..."
+    print "Saving state ..."
     utils.save_data(matches, 'matches_' + str(checkpoint_num))
     utils.save_data(discovered_summonerIds, 'discovered_summonerIds_' + str(checkpoint_num))
     utils.save_data(g, 'g_' + str(checkpoint_num))
@@ -154,7 +156,7 @@ def mine(checkpoint_num, matches, discovered_summonerIds, g, max_hop, bfs_queue,
             # Save data every CHECKPOINT_INTERVAL number of summonerIds
             save_state(checkpoint_num, matches, discovered_summonerIds, g, max_hop, bfs_queue, hop)
             checkpoint_num += 1
-
+            return ""
 
 
 if __name__ == '__main__':
@@ -164,7 +166,7 @@ if __name__ == '__main__':
     summonerId = int(sys.argv[1])
     checkpoint_num = int(sys.argv[2])
 
-    print "Starting at summonerId %d and checkpoint num %d..." % (summonerId, checkpoint_num)
+    print "Starting at summonerId %d and checkpoint num %d ..." % (summonerId, checkpoint_num)
 
     # Initialize or load checkpoint data
     if checkpoint_num == -1:
