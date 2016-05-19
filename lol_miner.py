@@ -38,6 +38,7 @@ def initialize(summonerId):
     # Initialize -- Starting from seed
     matches = {}  # Store data for all matches
     discovered_summonerIds = {summonerId: True}  # Track discovered nodes
+    discovered_matchIds = {}
     g = nx.Graph()
 
     max_hop = MAX_HOP  # Used as a stopping condition for Breadth First Search
@@ -45,7 +46,7 @@ def initialize(summonerId):
     bfs_queue = deque([{'summonerId': summonerId, 'hop': 0}])  # Queue for breadth first search
     hop = 0
 
-    return matches, discovered_summonerIds, g, max_hop, bfs_queue, hop
+    return matches, discovered_summonerIds, discovered_matchIds, g, max_hop, bfs_queue, hop
 
 
 def load_state(checkpoint_num):
@@ -58,17 +59,19 @@ def load_state(checkpoint_num):
         matches, discovered_summonerIds, g, max_hop, bfs_queue, hop
     """
     print "Loading data from checkpoint %d ..." % checkpoint_num
-    matches = utils.load_data('matches_' + str(checkpoint_num))
+    # matches = utils.load_data('matches_' + str(checkpoint_num))
+    matches = {}
     discovered_summonerIds = utils.load_data('discovered_summonerIds_' + str(checkpoint_num))
+    discovered_matchIds = utils.load_data('discovered_matchIds_' + str(checkpoint_num))
     g = utils.load_data('g_' + str(checkpoint_num))
     max_hop = utils.load_data('max_hop_' + str(checkpoint_num))
     bfs_queue = utils.load_data('bfs_queue_' + str(checkpoint_num))
     hop = utils.load_data('hop_' + str(checkpoint_num))
     print "Done loading."
-    return matches, discovered_summonerIds, g, max_hop, bfs_queue, hop
+    return matches, discovered_summonerIds, discovered_matchIds, g, max_hop, bfs_queue, hop
 
 
-def save_state(checkpoint_num, matches, discovered_summonerIds, g, max_hop, bfs_queue, hop):
+def save_state(checkpoint_num, matches, discovered_summonerIds, discovered_matchIds, g, max_hop, bfs_queue, hop):
     """
     Save all data structures to disk using a checkpoint num
     Args:
@@ -87,6 +90,7 @@ def save_state(checkpoint_num, matches, discovered_summonerIds, g, max_hop, bfs_
     print "Saving state ..."
     utils.save_data(matches, 'matches_' + str(checkpoint_num))
     utils.save_data(discovered_summonerIds, 'discovered_summonerIds_' + str(checkpoint_num))
+    utils.save_data(discovered_matchIds, 'discovered_matchIds_' + str(checkpoint_num))
     utils.save_data(g, 'g_' + str(checkpoint_num))
     utils.save_data(max_hop, 'max_hop_' + str(checkpoint_num))
     utils.save_data(bfs_queue, 'bfs_queue_' + str(checkpoint_num))
@@ -94,7 +98,7 @@ def save_state(checkpoint_num, matches, discovered_summonerIds, g, max_hop, bfs_
     print "Done saving."
 
 
-def mine(checkpoint_num, matches, discovered_summonerIds, g, max_hop, bfs_queue, hop):
+def mine(checkpoint_num, matches, discovered_summonerIds, discovered_matchIds, g, max_hop, bfs_queue, hop):
     """
     Mine using Breadth First Search algorithm.
 
@@ -123,8 +127,7 @@ def mine(checkpoint_num, matches, discovered_summonerIds, g, max_hop, bfs_queue,
         for i, matchId in enumerate(matchIds):
             print "\rMatch %d out of %d [%0.1f%%]" % (i+1, num_matches, (i+1)/float(num_matches)*100),
 
-            # TODO: matches occupies the most of amount of space in memory. Track discovered matchIds in a separate dict
-            if matchId in matches:  # skip loop if match info already retreived
+            if matchId in discovered_matchIds:  # skip loop if match info already retreived
                 continue
 
             # Get full match data and extract team members
@@ -149,6 +152,7 @@ def mine(checkpoint_num, matches, discovered_summonerIds, g, max_hop, bfs_queue,
             # Add match data to matches dict
             match = utils.list_of_dict_to_dict([match], 'matchId')
             matches.update(match)
+            discovered_matchIds[matchId] = True
 
             # Sleep to stay under the API data rate limit
             time.sleep(TIME_SLEEP)
@@ -171,9 +175,9 @@ if __name__ == '__main__':
 
     # Initialize or load checkpoint data
     if checkpoint_num == -1:
-        matches, discovered_summonerIds, g, max_hop, bfs_queue, hop = initialize(summonerId)
+        matches, discovered_summonerIds, discovered_matchIds, g, max_hop, bfs_queue, hop = initialize(summonerId)
     else:
-        matches, discovered_summonerIds, g, max_hop, bfs_queue, hop = load_state(checkpoint_num)
+        matches, discovered_summonerIds, discovered_matchIds, g, max_hop, bfs_queue, hop = load_state(checkpoint_num)
 
     # They call it a mine! A MINE!!
-    mine(checkpoint_num, matches, discovered_summonerIds, g, max_hop, bfs_queue, hop)
+    mine(checkpoint_num, matches, discovered_summonerIds, discovered_matchIds, g, max_hop, bfs_queue, hop)
