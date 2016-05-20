@@ -160,7 +160,7 @@ def mine(checkpoint_num, matches, discovered_summonerIds, discovered_matchIds, g
         if loop_count % CHECKPOINT_INTERVAL == 0:
             # Save data every CHECKPOINT_INTERVAL number of summonerIds
             checkpoint_num += 1
-            save_state(checkpoint_num, matches, discovered_summonerIds, g, max_hop, bfs_queue, hop)
+            save_state(checkpoint_num, matches, discovered_summonerIds, discovered_matchIds, g, max_hop, bfs_queue, hop)
             return ""
 
 
