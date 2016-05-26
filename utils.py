@@ -96,3 +96,53 @@ def dict_append_to_value_lists(dict_appendee, dict_new):
         dict_appendee[key] += [dict_new[key]]
 
     return dict_appendee
+
+
+def load_state(checkpoint_num):
+    """
+    Load data structures from disk using a checkpoint number.
+    Args:
+        checkpoint_num:
+
+    Returns:
+        matches, discovered_summonerIds, g, max_hop, bfs_queue, hop
+    """
+    print "Loading data from checkpoint %d ..." % checkpoint_num
+    # matches = utils.load_data('matches_' + str(checkpoint_num))
+    matches = {}
+    discovered_summonerIds = utils.load_data('discovered_summonerIds_' + str(checkpoint_num))
+    discovered_matchIds = utils.load_data('discovered_matchIds_' + str(checkpoint_num))
+    g = utils.load_data('g_' + str(checkpoint_num))
+    max_hop = utils.load_data('max_hop_' + str(checkpoint_num))
+    bfs_queue = utils.load_data('bfs_queue_' + str(checkpoint_num))
+    hop = utils.load_data('hop_' + str(checkpoint_num))
+    print "Done loading."
+    return matches, discovered_summonerIds, discovered_matchIds, g, max_hop, bfs_queue, hop
+
+
+def save_state(checkpoint_num, matches, discovered_summonerIds, discovered_matchIds, g, max_hop, bfs_queue, hop):
+    """
+    Save all data structures to disk using a checkpoint num
+    Args:
+        checkpoint_num:
+        matches:
+        discovered_summonerIds:
+        g:
+        max_hop:
+        bfs_queue:
+        hop:
+
+    Returns:
+        no return
+    """
+    # Save state
+    print "Saving state ..."
+    utils.save_data(matches, 'matches_' + str(checkpoint_num))
+    utils.save_data(discovered_summonerIds, 'discovered_summonerIds_' + str(checkpoint_num))
+    utils.save_data(discovered_matchIds, 'discovered_matchIds_' + str(checkpoint_num))
+    utils.save_data(g, 'g_' + str(checkpoint_num))
+    utils.save_data(max_hop, 'max_hop_' + str(checkpoint_num))
+    utils.save_data(bfs_queue, 'bfs_queue_' + str(checkpoint_num))
+    utils.save_data(hop, 'hop_' + str(checkpoint_num))
+    print "Done saving."
+
