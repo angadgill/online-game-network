@@ -108,14 +108,14 @@ def load_state(checkpoint_num):
         matches, discovered_summonerIds, g, max_hop, bfs_queue, hop
     """
     print "Loading data from checkpoint %d ..." % checkpoint_num
-    # matches = utils.load_data('matches_' + str(checkpoint_num))
+    # matches = load_data('matches_' + str(checkpoint_num))
     matches = {}
-    discovered_summonerIds = utils.load_data('discovered_summonerIds_' + str(checkpoint_num))
-    discovered_matchIds = utils.load_data('discovered_matchIds_' + str(checkpoint_num))
-    g = utils.load_data('g_' + str(checkpoint_num))
-    max_hop = utils.load_data('max_hop_' + str(checkpoint_num))
-    bfs_queue = utils.load_data('bfs_queue_' + str(checkpoint_num))
-    hop = utils.load_data('hop_' + str(checkpoint_num))
+    discovered_summonerIds = load_data('discovered_summonerIds_' + str(checkpoint_num))
+    discovered_matchIds = load_data('discovered_matchIds_' + str(checkpoint_num))
+    g = load_data('g_' + str(checkpoint_num))
+    max_hop = load_data('max_hop_' + str(checkpoint_num))
+    bfs_queue = load_data('bfs_queue_' + str(checkpoint_num))
+    hop = load_data('hop_' + str(checkpoint_num))
     print "Done loading."
     return matches, discovered_summonerIds, discovered_matchIds, g, max_hop, bfs_queue, hop
 
@@ -137,12 +137,12 @@ def save_state(checkpoint_num, matches, discovered_summonerIds, discovered_match
     """
     # Save state
     print "Saving state ..."
-    utils.save_data(matches, 'matches_' + str(checkpoint_num))
-    utils.save_data(discovered_summonerIds, 'discovered_summonerIds_' + str(checkpoint_num))
-    utils.save_data(discovered_matchIds, 'discovered_matchIds_' + str(checkpoint_num))
-    utils.save_data(g, 'g_' + str(checkpoint_num))
-    utils.save_data(max_hop, 'max_hop_' + str(checkpoint_num))
-    utils.save_data(bfs_queue, 'bfs_queue_' + str(checkpoint_num))
-    utils.save_data(hop, 'hop_' + str(checkpoint_num))
+    save_data(matches, 'matches_' + str(checkpoint_num))
+    save_data(discovered_summonerIds, 'discovered_summonerIds_' + str(checkpoint_num))
+    save_data(discovered_matchIds, 'discovered_matchIds_' + str(checkpoint_num))
+    save_data(g, 'g_' + str(checkpoint_num))
+    save_data(max_hop, 'max_hop_' + str(checkpoint_num))
+    save_data(bfs_queue, 'bfs_queue_' + str(checkpoint_num))
+    save_data(hop, 'hop_' + str(checkpoint_num))
     print "Done saving."
 
